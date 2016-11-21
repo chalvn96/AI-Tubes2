@@ -19,17 +19,8 @@ import weka.core.Instances;
  *
  * @author lenovo
  */
-//class Kelas implements Serializable {
-//    private String element0;
-//    private Integer element1;
-//    
-//    public Kelas(){
-//        element0 = new String();
-//        element1 = null;
-//    }
-//    
-//}
 
+//Trice menyimpan: nama atribut, value tertenu dari atribut yang hendak diolah,dan value dari kelas
 class Trice<K, L, V> implements Serializable {
     private final K element0;
     private final L element1;
@@ -50,7 +41,8 @@ class Trice<K, L, V> implements Serializable {
         this.element1 = element1;
         this.element2 = element2;
     }
-
+    
+    //getter
     public K getElement0() {
         return element0;
     }
@@ -62,9 +54,10 @@ class Trice<K, L, V> implements Serializable {
     public V getElement2() {
         return element2;
     }
+    
     @Override
     public boolean equals(Object o)
-    {
+    {//mengembalikan true jika object yang dibandingkan dianggap sama
         if (o instanceof Trice) {
            Trice<?, ?, ?> trice = (Trice<?, ?, ?>) o;
            return this.element0.equals(trice.element0) && this.element1.
@@ -74,88 +67,77 @@ class Trice<K, L, V> implements Serializable {
     }
     
     @Override
-    public int hashCode(){
-        return (int) element0.hashCode() * element1.hashCode() 
-                * element2.hashCode();
+    public int hashCode(){//mengembalikan hash Code
+        return (int) element0.hashCode() * element1.hashCode() * element2.hashCode();
     }
-
 }
 
 
 public class NaiveBayes extends AbstractClassifier implements Classifier, Serializable {
-    private Map< Trice<String,String,String>, Integer >  m; //data
-    private Map<String, Integer> mKelas; //hitung jumlah per kelas
-    private Map<String, Double> mHitung; //hitung peluang
+    //melakukan pengerjaan NaiveBayes dengan implementasi sendiri
+    
+    private Map< Trice<String,String,String>, Integer >  m; //menyimpan data(sebagaimana dituliskan di atas) dan jumlah yang ditemui
+    private Map<String, Integer> mKelas; //menyimpan hitung jumlah per kelas
+    private Map<String, Double> mHitung; //menyimpan hitung peluang
     private int dataSize;
     
     public NaiveBayes() {
         
     }
+    
     @Override
-    public void buildClassifier(Instances data) throws Exception {
-        //generate
+    public void buildClassifier(Instances data) throws Exception {//melakukan override untuk buildCassifier
+        
+        //generate (temp)
         m = new HashMap(); //data
         mKelas = new HashMap(); //hitung jumlah per kelas
         mHitung = new HashMap(); //hitung peluang
        
         int jumlahAtributAsli = data.numAttributes();
         int indexKelas = data.classIndex();
-        //int jumlahAtribut = jumlahAtributAsli - 1;
-        System.out.println(jumlahAtributAsli - 1);
-        System.out.println(indexKelas);
-//        paling ujung brrt jumlahAtribut-1
         int jumlahValuePerAtribut;
-//        int jumlahKelas = data.attribute(jumlahAtribut).numValues();
         int jumlahKelas = data.attribute(indexKelas).numValues();
-        System.out.println("tes1");
         dataSize = data.size();
-//        for (int i = 0; i < jumlahAtribut; i++){//karena yg paling ujung itu kelas
-        for (int i = 0; i < jumlahAtributAsli; i++){//karena yg paling ujung itu kelas
+        
+        /*System.out.println("Jumlah Atribut pembacaan: "+jumlahAtributAsli - 1);
+        System.out.println("Kelas berada di index: "+indexKelas);*/
+        
+        for (int i = 0; i < jumlahAtributAsli; i++){//karena index start dr 0
             if (i == indexKelas) {
-                
+                //tidak perlu digenerate
             } else {
                 jumlahValuePerAtribut =  data.attribute(i).numValues();
                 for (int j = 0; j < jumlahValuePerAtribut; j++) {
                     for (int k = 0; k < jumlahKelas; k++){
-
                         Trice<String, String, String> trice = new Trice();
-//                        pair = pair.createPair(data.attribute(i).value(j), data.attribute(jumlahAtribut).value(k));
                         trice = trice.createTrice(data.attribute(i).name(), data.attribute(i).value(j), data.attribute(indexKelas).value(k));
-                        
                         m.put(trice,0);
                     }
                 }
             }
         }
-        System.out.println("tes3");
+        //System.out.println("selesai generate data store");
        
         //init for kelas
         for (int i = 0; i < jumlahKelas; i++){
-//            mKelas.put(data.attribute(jumlahAtribut).value(i), 0);
             mKelas.put(data.attribute(indexKelas).value(i), 0);
-//            System.out.println(data.attribute(indexKelas).value(i));
-//            mHitung.put(data.attribute(jumlahAtribut).value(i),0.0);
             mHitung.put(data.attribute(indexKelas).value(i),0.0);
         }
-        System.out.println("tes4");
-        //update isi atribut
+        //System.out.println("selesai generate class store");
+        
+        //update isi atribut sesuai pembacaan
         for (int i = 0; i < data.size(); i++) {
             String hKelas = new String();
             hKelas = data.instance(i).stringValue(indexKelas);
-//            hKelas = data.instance(i).stringValue(jumlahAtribut);
-//            System.out.println(data.instance(i).stringValue(indexKelas));
-//            System.out.println(data.instance(i).stringValue(jumlahAtribut));
             if (mKelas.containsKey(hKelas)) {
                 mKelas.put(hKelas, mKelas.get(hKelas) + 1);
-//                System.out.println("hKelas " + hKelas);
-//                System.out.println("mkelas " + mKelas.get(hKelas) + 1);
             }
-            for (int j = 0; j < jumlahAtributAsli; j++){//dikurang 2 karena mulai dari 0 dan atribut paling ujung itu kelas
+            for (int j = 0; j < jumlahAtributAsli; j++){
                 if (j != indexKelas) {
                     Trice<String, String, String> x = new Trice();
-//                   x = x.createPair(data.instance(i).stringValue(j), data.instance(i).stringValue(jumlahAtribut));
-                    x = x.createTrice(data.attribute(j).name(), data.instance(i).stringValue(j), data.instance(i).stringValue(indexKelas));
-                    if(m.containsKey(x)) {
+                    x = x.createTrice(data.attribute(j).name(), data.instance(i).stringValue(j),
+                            data.instance(i).stringValue(indexKelas));
+                    if(m.containsKey(x)) {//jika data yang dibaca ada yang sesuai dengan hasil generate
                         m.put(x, m.get(x) + 1);
                     }
                     else {
@@ -165,9 +147,10 @@ public class NaiveBayes extends AbstractClassifier implements Classifier, Serial
             }
         }
        
-       //print
-        System.out.println("===========");
+        System.out.println("================");
         
+        //Print
+        /*
         for (Map.Entry<Trice<String,String,String>,Integer> entry : m.entrySet()) {
             Trice<String,String,String> key = entry.getKey();
             Integer count = entry.getValue();
@@ -182,49 +165,41 @@ public class NaiveBayes extends AbstractClassifier implements Classifier, Serial
             Integer count = entry.getValue();
             // do stuff
             System.out.println(key+" "+count);
-        }
-        
-        //mengolah fread (yg mau diclassify
-//        for (int i = 0; i < jumlahAtributAsli; i++){//karna yg paling ujung iu kelas nah ini masalah krn ga selalu yg paling ujung itu kelas
-//           //String fKelas = new String();
-//           //fKelas = data.instance(i).stringValue(jumlahAtribut);
-//           if (i == indexKelas) {
-//                Double hitung = 0.0;
-//           }
-//        }
+        }*/
     }
 
     @Override
     public double classifyInstance(Instance instnc) throws Exception {
+        //melakukan override untuk pemodelan
         int jumlahAtributAsli = instnc.numAttributes();
-        
         int jumlahData = 0;
         String kelasNow = "";
         double tempHitung;
         double hitung;
-        double[] listclass = new double[instnc.attribute(instnc.classIndex()).numValues()];
+        double[] listclass = new double[instnc.attribute(instnc.classIndex()).numValues()]; //menyimpan daftar nilai
         int max = 0;
         int nilaiMax = 0;
+        
         for(int k = 0; k < instnc.attribute(instnc.classIndex()).numValues(); k++){
             hitung = 1.0;
             for(int i = 0; i < jumlahAtributAsli; i++) {
                 if (i != instnc.classIndex()) {
                     Trice<String, String, String> cek = new Trice();
-                    System.out.println("string value " + instnc.stringValue(i));
+                    //System.out.println("string value " + instnc.stringValue(i));
                     kelasNow = instnc.attribute(instnc.classIndex()).value(k);
                     cek = cek.createTrice(instnc.attribute(i).name(), instnc.stringValue(i), kelasNow);
-                    System.out.println("cek " + m.get(cek));
-                    System.out.println("kelas " + mKelas.get(kelasNow));
+                    //System.out.println("cek " + m.get(cek));
+                    //System.out.println("kelas " + mKelas.get(kelasNow));
                     tempHitung = ((double) m.get(cek) / (double) mKelas.get(kelasNow));
-                    System.out.println("tempHitung " + tempHitung);
+                    //System.out.println("tempHitung " + tempHitung);
                     hitung = hitung * tempHitung;
-                    System.out.println("hitung " + hitung);
+                    //System.out.println("hitung " + hitung);
                 }
             }
             hitung = hitung * ((double) mKelas.get(kelasNow) / (double) dataSize);
-            System.out.println("hitung kedua " + hitung);
+            //System.out.println("hitung kedua " + hitung);
             listclass[k] = hitung;
-            System.out.println(k + " " + listclass[k]);
+            //System.out.println(k + " " + listclass[k]);
             if(nilaiMax < hitung){
                 max = k;
             }
@@ -249,30 +224,26 @@ public class NaiveBayes extends AbstractClassifier implements Classifier, Serial
                     //System.out.println("string value " + instnc.stringValue(i));
                     kelasNow = instnc.attribute(instnc.classIndex()).value(k);
                     cek = cek.createTrice(instnc.attribute(i).name(), instnc.stringValue(i), kelasNow);
-                    //System.out.println("cek " + m.get(cek));
-                    //System.out.println("kelas " + mKelas.get(kelasNow));
                     tempHitung = ((double) m.get(cek) / (double) mKelas.get(kelasNow));
-                    //System.out.println("tempHitung " + tempHitung);
-                    hitung = hitung * tempHitung;
-                    //System.out.println("hitung " + hitung);
+                    hitung = hitung * tempHitung; //hasil perkalian dari peluang atribut | value kelas
                 }
             }
-            hitung = hitung * ((double) mKelas.get(kelasNow) / (double) dataSize);
+            hitung = hitung * ((double) mKelas.get(kelasNow) / (double) dataSize); //dikali peluang terwujudnya value kelas
             
+            //penanganan bilangan NaN
             if (isNaN(hitung)) {
-                hitung = 0.0;
+                 hitung = 0.0;
             }
-            System.out.println("hitung kedua " + hitung);
             
+            //assign nilai hitung ke list
             listclass[k] = hitung;
         }
-        
         return listclass;
     }
 
     @Override
     public Capabilities getCapabilities() {
-        
+        //melakukan override getCapabilities
         Capabilities result = super.getCapabilities();
         result.disableAll();
 
