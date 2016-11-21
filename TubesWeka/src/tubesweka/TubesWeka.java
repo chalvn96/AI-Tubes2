@@ -52,18 +52,16 @@ public class TubesWeka {
 
         
         //Melakukan filter
-        //Discretize filter = new Discretize();
         Normalize filter = new Normalize();  
         filter.setInputFormat(data);
         Instances filteredData = Filter.useFilter(data, filter);
-        //System.out.println(filteredData);
-//        Instances filteredData = data;
-        if (n == 1) {
+        if (n == 1) {//memilih model pembelajaran
             Instances datatest = data;
             System.out.println("Membaca datatesting...");
             System.out.print("Masukan model yang ingin digunakan :");
             inputUser = new Scanner(System.in);
             string = inputUser.nextLine();
+            
             //Classification
             double result = 0.0;
             Instances filterDataSet = Filter.useFilter(datatest, filter);
@@ -81,7 +79,7 @@ public class TubesWeka {
             System.out.println("Classification : ");
             System.out.println(filterDataSet.classAttribute().value((int) result));
             
-        } else if (n == 2) {
+        } else if (n == 2) {//memilih dataset yang ingin dipelajari
             Evaluation eval = new Evaluation(filteredData);
             System.out.println("Pilih salah satu teknik pembelajaran :");
             System.out.println("1. Naive Bayes");
@@ -89,7 +87,7 @@ public class TubesWeka {
             System.out.print("Masukan input: ");
             n = inputUser.nextInt();
             Classifier classifier = null;
-            if (n == 1) {
+            if (n == 1) {//NAIVE BAYES
                 classifier = new NaiveBayes();
                 
                 System.out.println("Build Classifier");
@@ -98,8 +96,7 @@ public class TubesWeka {
                 int folds = 500;
                 eval.crossValidateModel(classifier, filteredData, folds,
                         new Random(1));
-                //eval.evaluateModel(classifier, filteredData);
-            } else if (n == 2) {
+            } else if (n == 2) {//FFNN
                 System.out.print("Masukkan jumlah hidden layer [0-1]: ");
                 int jumlahHL = inputUser.nextInt(); //jumlah hidden layer
                 int jumlahNeuron = 0;
@@ -109,10 +106,9 @@ public class TubesWeka {
                 }
                 classifier = new FFNN(jumlahHL, jumlahNeuron);
                 classifier.buildClassifier(filteredData);
-                int folds = 10;
+                int folds = 10; //10 folds
                 eval.crossValidateModel(classifier, filteredData, folds,
                         new Random(1));
-//                eval.evaluateModel(classifier, filteredData);
             }
             
             //mengeluarkan hasil evaluasi
