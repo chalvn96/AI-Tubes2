@@ -1,0 +1,2 @@
+tubesweka.Trice
+tubesweka.NaiveBayes

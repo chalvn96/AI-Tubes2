@@ -18,7 +18,10 @@ import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.Discretize;
+import weka.filters.supervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
+import weka.filters.unsupervised.attribute.RenameNominalValues;
+import weka.filters.unsupervised.instance.Randomize;
 
 /**
  *
@@ -49,12 +52,20 @@ public class TubesWeka {
         //Preparing data
         PrepareData preparedata = new PrepareData();
         Instances data = preparedata.getData();
-
-        
-        //Melakukan filter
-        Normalize filter = new Normalize();  
-        filter.setInputFormat(data);
-        Instances filteredData = Filter.useFilter(data, filter);
+        //System.out.println(data);
+        Randomize random = new Randomize();
+        random.setInputFormat(data);
+        Instances randomize = Filter.useFilter(data, random);
+        System.out.println(randomize);
+        NominalToBinary filter = new NominalToBinary();
+        //RenameNominalValues filter = new RenameNominalValues();
+        filter.setInputFormat(randomize);
+        Instances filterNominal = Filter.useFilter(randomize, filter);
+        //System.out.println(filterNominal);
+        Normalize filter1 = new Normalize();
+        filter1.setInputFormat(filterNominal);
+        Instances filteredData = Filter.useFilter(filterNominal, filter1);
+        //System.out.println(filteredData);
         if (n == 1) {//memilih model pembelajaran
             Instances datatest = data;
             System.out.println("Membaca datatesting...");
@@ -77,7 +88,7 @@ public class TubesWeka {
                 e.printStackTrace();
             }
             System.out.println("Classification : ");
-            System.out.println(filterDataSet.classAttribute().value((int) result));
+            
             
         } else if (n == 2) {//memilih dataset yang ingin dipelajari
             Evaluation eval = new Evaluation(filteredData);
@@ -106,6 +117,7 @@ public class TubesWeka {
                 }
                 classifier = new FFNN(jumlahHL, jumlahNeuron);
                 classifier.buildClassifier(filteredData);
+                System.out.println("SELESAI BUILD CLASSIFIER");
                 int folds = 10; //10 folds
                 eval.crossValidateModel(classifier, filteredData, folds,
                         new Random(1));
