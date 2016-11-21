@@ -7,6 +7,7 @@ package tubesweka;
 
 import java.io.Serializable;
 import static java.lang.Math.exp;
+import static java.lang.Math.pow;
 import java.util.Random;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
@@ -58,7 +59,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
     }
     
     private double sigmoid (double x) {
-        return 1 / (1 + exp(-1 * x));
+        return 1 / (1 + exp(x));
     }
     
     private double errorOp (double output, double target) {
@@ -81,8 +82,20 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         return x;
     }
     
+    private double sigmaErrorSP (double[] error) {
+        double x = 0.0;
+        for (int i = 0; i < jumlahKelas; i++) {
+            x += error[i];
+        }
+        return x;
+    }
+    
     private double updateWeight (double weight, double error, double input) {
         return weight + (learningRate * input * error);
+    }
+    
+    private double errorSP (double output, double target) {
+        return pow(target - output, 2.0) / 2.0;
     }
     
     @Override
@@ -96,10 +109,10 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         
         //initialize bias and learning rate;
         Random r = new Random();
+        bias = 1.0;
         learningRate = 0.9;
-        threshold = 0.000001;
+        threshold = 0.01;
         int limit = 1000;
-        int iterate = 0;
         
         if (jumlahHL == 1) {
             //initialisasi random weight untuk atribut -> hidden layer
@@ -107,7 +120,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
             for (int i = 0; i < jumlahNeuron; i++) {
                 for (int j = 0; j < jumlahAtributAsli + 1; j++) { //+1 untuk bias
                     if (j != data.classIndex()) {
-                        weightHL[i][j] = r.nextDouble();               
+                        weightHL[i][j] = (r.nextDouble() * 2) - 1;               
                     }
                 }
             }
@@ -116,7 +129,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
             weightOp = new double[jumlahKelas][jumlahNeuron + 1];
             for (int i = 0; i < jumlahKelas; i++) {
                 for (int j = 0; j < jumlahNeuron + 1; j++) { //+1 untuk bias
-                    weightOp[i][j] = r.nextDouble();
+                    weightOp[i][j] = (r.nextDouble() * 2) - 1;
                 }
             }
             
@@ -124,7 +137,9 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
             double[] hiddenLayer = new double[jumlahNeuron];
             double[] output = new double[jumlahKelas];
             double totalError;
+            int count = 0;
             do {
+                count++;
                 totalError = 0.0;
                 //learning
                 for (int nIns = 0; nIns < jumlahData; nIns++) {
@@ -190,9 +205,11 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     for (int i = 0; i < jumlahKelas; i++) {
                         errorOp[i] = errorOp(output[i], ins.value(ins.classIndex()));
                     }
+                    //2System.out.println("        sigmaError= "+sigmaError(errorOp));
                     totalError += sigmaError(errorOp);
                 }
-            } while (totalError > threshold);
+                System.out.println("totalError = " + totalError);
+            } while ((totalError > threshold)&&(count<limit));
             
         } else { //jumlahHL == 0 (single perceptron)
             //initialisasi random weight untuk atribut
@@ -200,7 +217,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
             for (int i = 0; i < jumlahKelas; i++) {
                 for (int j = 0; j < jumlahAtributAsli + 1; j++) {
                     if (j != data.classIndex()) {
-                        weightOp[i][j] = r.nextDouble();
+                        weightOp[i][j] = (r.nextDouble() * 2) - 1;
                     }
                 }
             }
@@ -248,7 +265,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     //hitung error masing-masing output
                     double[] errorOp = new double[jumlahKelas];
                     for (int i = 0; i < jumlahKelas; i++) {
-                        errorOp[i] = errorOp(output[i], ins.value(ins.classIndex()));
+                        errorOp[i] = errorSP(output[i], ins.value(ins.classIndex()));
                     }
                     totalError += sigmaError(errorOp);
                 } 
