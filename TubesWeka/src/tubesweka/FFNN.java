@@ -111,7 +111,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         //initialize bias and learning rate;
         Random r = new Random();
         bias = 1.0;
-        learningRate = 0.5;
+        learningRate = 0.3;
         threshold = 0.001;
         
         if (jumlahHL == 1) {

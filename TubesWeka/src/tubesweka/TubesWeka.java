@@ -5,22 +5,16 @@
  */
 package tubesweka;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.trees.J48;
-import weka.core.Attribute;
 import weka.core.Debug.Random;
-import weka.core.DenseInstance;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.Discretize;
 import weka.filters.supervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
-import weka.filters.unsupervised.attribute.RenameNominalValues;
 import weka.filters.unsupervised.instance.Randomize;
 
 /**
@@ -53,18 +47,10 @@ public class TubesWeka {
         PrepareData preparedata = new PrepareData();
         Instances data = preparedata.getData();
         //System.out.println(data);
+        Evaluation eval = null;
         Randomize random = new Randomize();
         random.setInputFormat(data);
         Instances randomize = Filter.useFilter(data, random);
-        System.out.println(randomize);
-        NominalToBinary filter = new NominalToBinary();
-        //RenameNominalValues filter = new RenameNominalValues();
-        filter.setInputFormat(randomize);
-        Instances filterNominal = Filter.useFilter(randomize, filter);
-        //System.out.println(filterNominal);
-        Normalize filter1 = new Normalize();
-        filter1.setInputFormat(filterNominal);
-        Instances filteredData = Filter.useFilter(filterNominal, filter1);
         //System.out.println(filteredData);
         if (n == 1) {//memilih model pembelajaran
             Instances datatest = data;
@@ -75,15 +61,22 @@ public class TubesWeka {
             
             //Classification
             double result = 0.0;
+            Discretize filter = new Discretize();
+            filter.setInputFormat(datatest);
             Instances filterDataSet = Filter.useFilter(datatest, filter);
-            
+                
             try { 
-                Classifier classifier = (Classifier) SerializationHelper.read(string);
+                Classifier classifier = (Classifier) SerializationHelper.read(string + ".model");
                 classifier.buildClassifier(filterDataSet);
-                Evaluation eval = new Evaluation(filterDataSet);
-                int folds = 14;
-                eval.crossValidateModel(classifier, filteredData, folds,
-                        new Random(1));
+                eval = new Evaluation(filterDataSet);
+//                int folds = 14;
+//                eval.crossValidateModel(classifier, filteredData, folds,
+//                        new Random(1));
+                for (int i = 0;  i < filterDataSet.numInstances(); i++) {
+                    result = classifier.classifyInstance(filterDataSet.instance(i));
+                    filterDataSet.instance(i).setClassValue(result);
+                    System.out.println(filterDataSet.classAttribute().value((int) result));
+                }
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -91,23 +84,39 @@ public class TubesWeka {
             
             
         } else if (n == 2) {//memilih dataset yang ingin dipelajari
-            Evaluation eval = new Evaluation(filteredData);
+            
             System.out.println("Pilih salah satu teknik pembelajaran :");
             System.out.println("1. Naive Bayes");
             System.out.println("2. FFNN");
             System.out.print("Masukan input: ");
             n = inputUser.nextInt();
             Classifier classifier = null;
+
+            Normalize normal = new Normalize();
+            normal.setInputFormat(randomize);
+            Instances normalize = Filter.useFilter(randomize, normal);
             if (n == 1) {//NAIVE BAYES
-                classifier = new NaiveBayes();
+                Discretize filter = new Discretize();
+                filter.setInputFormat(normalize);
+                Instances filteredData = Filter.useFilter(normalize, filter);
+                
+                classifier = new NaiveBayes();                
+                eval = new Evaluation(filteredData);            
                 
                 System.out.println("Build Classifier");
                 classifier.buildClassifier(filteredData);
                 System.out.println("Evaluate model");
-                int folds = 500;
+                int folds = 10;
                 eval.crossValidateModel(classifier, filteredData, folds,
                         new Random(1));
             } else if (n == 2) {//FFNN
+                NominalToBinary ntb = new NominalToBinary();
+                ntb.setInputFormat(normalize);
+                Instances filteredData = Filter.useFilter(normalize, ntb);
+                
+                eval = new Evaluation(filteredData);            
+                
+                
                 System.out.print("Masukkan jumlah hidden layer [0-1]: ");
                 int jumlahHL = inputUser.nextInt(); //jumlah hidden layer
                 int jumlahNeuron = 0;
