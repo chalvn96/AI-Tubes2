@@ -48,9 +48,9 @@ public class TubesWeka {
         Instances data = preparedata.getData();
         //System.out.println(data);
         Evaluation eval = null;
-        Randomize random = new Randomize();
-        random.setInputFormat(data);
-        Instances randomize = Filter.useFilter(data, random);
+//        Randomize random = new Randomize();
+//        random.setInputFormat(data);
+//        Instances randomize = Filter.useFilter(data, random);
         //System.out.println(filteredData);
         if (n == 1) {//memilih model pembelajaran
             Instances datatest = data;
@@ -61,16 +61,16 @@ public class TubesWeka {
             
             //Classification
             double result = 0.0;
-            Discretize filter = new Discretize();
-            filter.setInputFormat(datatest);
-            Instances filterDataSet = Filter.useFilter(datatest, filter);
+//            Discretize filter = new Discretize();
+//            filter.setInputFormat(datatest);
+//            Instances filterDataSet = Filter.useFilter(datatest, filter);
 //            
-//                Normalize normal = new Normalize();  
-//                normal.setInputFormat(data);
-//                Instances normalize = Filter.useFilter(data, normal);
-//                NominalToBinary ntb = new NominalToBinary();
-//                ntb.setInputFormat(normalize);
-//                Instances filterDataSet = Filter.useFilter(normalize, ntb);
+                Normalize normal = new Normalize();  
+                normal.setInputFormat(data);
+                Instances normalize = Filter.useFilter(data, normal);
+                NominalToBinary ntb = new NominalToBinary();
+                ntb.setInputFormat(normalize);
+                Instances filterDataSet = Filter.useFilter(normalize, ntb);
         
             try { 
                 Classifier classifier = (Classifier) SerializationHelper.read(string + ".model");
@@ -104,8 +104,8 @@ public class TubesWeka {
             Classifier classifier = null;
 
             Normalize normal = new Normalize();
-            normal.setInputFormat(randomize);
-            Instances normalize = Filter.useFilter(randomize, normal);
+            normal.setInputFormat(data);
+            Instances normalize = Filter.useFilter(data, normal);
             if (n == 1) {//NAIVE BAYES
                 Discretize filter = new Discretize();
                 filter.setInputFormat(normalize);
