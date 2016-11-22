@@ -56,7 +56,7 @@ public class TubesWeka {
         Randomize random = new Randomize();
         random.setInputFormat(data);
         Instances randomize = Filter.useFilter(data, random);
-        System.out.println(randomize);
+        
         NominalToBinary filter = new NominalToBinary();
         //RenameNominalValues filter = new RenameNominalValues();
         filter.setInputFormat(randomize);

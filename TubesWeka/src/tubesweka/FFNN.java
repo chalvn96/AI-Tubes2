@@ -24,6 +24,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
     private double bias;
     private double learningRate;
     private double threshold;
+    private double momentum;
     
     private int jumlahData;
     private int jumlahAtributAsli;
@@ -70,7 +71,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
     private double errorHL (double hiddenlayer, double[] errorOp, double[][] weight, int index) {
         double x = 0.0;
         for (int i = 0; i < jumlahKelas; i++) {
-            x += errorOp[i] * weight[i][index];
+            x += errorOp[i] * weight[i][index]*momentum;
         }
         return hiddenlayer * (1 - hiddenlayer) * x;
     }
@@ -80,7 +81,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         for (int i = 0; i < jumlahKelas; i++) {
             x += error[i] * error[i];
         }
-        return x/2.0;
+        return x/jumlahKelas;
     }
     
     private double sigmaErrorSP (double[] error) {
@@ -88,16 +89,14 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         for (int i = 0; i < jumlahKelas; i++) {
             x += error[i] * error[i];
         }
-        return x/2.0;
+        return x/jumlahKelas;
     }
     
     private double updateWeight (double weight, double error, double input) {
         return weight + (learningRate * input * error);
     }
     
-    private double errorSP (double output, double target) {
-        return pow(target - output, 2.0) / 2.0;
-    }
+
     
     @Override
     public void buildClassifier(Instances data) throws Exception {
@@ -111,8 +110,9 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         //initialize bias and learning rate;
         Random r = new Random();
         bias = 1.0;
-        learningRate = 0.5;
-        threshold = 0.001;
+        learningRate = 0.4;
+        threshold = 0.0005;
+        momentum = 0.95;
         
         if (jumlahHL == 1) {
             //initialisasi random weight untuk atribut -> hidden layer
@@ -163,7 +163,6 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                             errorOp[i] = errorOp(output[i], 1.00);
                         else
                             errorOp[i] = errorOp(output[i], 0.00 );
-                                                
                                 
                     }
                     
@@ -258,10 +257,12 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     double[] errorOp = new double[jumlahKelas];
                     for (int i = 0; i < jumlahKelas; i++) {
                         
-                        if( i == Math.round(ins.value(ins.classIndex()))  )
+                        if( i == Math.round(ins.value(ins.classIndex()))  ){
                             errorOp[i] = errorOp(output[i], 1.00);
-                        else
+                        }
+                        else{
                             errorOp[i] = errorOp(output[i], 0.00 );
+                        }
                     }
                     
                     //update setiap weight output
@@ -321,16 +322,21 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         double[] hiddenLayer = new double[jumlahNeuron];
         double[] output = new double[jumlahKelas];
         
-        //hitung hiddenLayer
-        for (int i = 0; i < jumlahNeuron; i++) {
-            hiddenLayer[i] = sigmoid(sigmaHL(weightHL[i], ins));
-        }
+        if(jumlahHL == 1){
+            //hitung hiddenLayer
+            for (int i = 0; i < jumlahNeuron; i++) {
+                hiddenLayer[i] = sigmoid(sigmaHL(weightHL[i], ins));
+            }
 
-        //hitung output layer
-        for (int i = 0; i < jumlahKelas; i++) {
-            output[i] = sigmoid(sigmaOp(weightOp[i], hiddenLayer));
+            //hitung output layer
+            for (int i = 0; i < jumlahKelas; i++) {
+                output[i] = sigmoid(sigmaOp(weightOp[i], hiddenLayer));
+            }
+        } else {
+            for (int i = 0; i < jumlahKelas; i++) {
+                output[i] = sigmoid(sigmaHL(weightOp[i], ins));
+            }
         }
-        
         return output;
     }
 
