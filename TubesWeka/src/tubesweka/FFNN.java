@@ -111,7 +111,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         //initialize bias and learning rate;
         Random r = new Random();
         bias = 1.0;
-        learningRate = 0.3;
+        learningRate = 0.65;
         threshold = 0.001;
         
         if (jumlahHL == 1) {
@@ -225,7 +225,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                 //2System.out.println("Total error : " + totalError);
                 count++;
                 //System.out.println("Total Error : "+totalError);
-            } while (Math.abs(totalError) > threshold && count < 5000) ;
+            } while (Math.abs(totalError) > threshold && count < 100000) ;
             
         } else { //jumlahHL == 0 (single perceptron)
             //initialisasi random weight untuk atribut
@@ -321,16 +321,21 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         double[] hiddenLayer = new double[jumlahNeuron];
         double[] output = new double[jumlahKelas];
         
-        //hitung hiddenLayer
-        for (int i = 0; i < jumlahNeuron; i++) {
-            hiddenLayer[i] = sigmoid(sigmaHL(weightHL[i], ins));
-        }
+        if(jumlahHL == 1){
+            //hitung hiddenLayer
+            for (int i = 0; i < jumlahNeuron; i++) {
+                hiddenLayer[i] = sigmoid(sigmaHL(weightHL[i], ins));
+            }
 
-        //hitung output layer
-        for (int i = 0; i < jumlahKelas; i++) {
-            output[i] = sigmoid(sigmaOp(weightOp[i], hiddenLayer));
+            //hitung output layer
+            for (int i = 0; i < jumlahKelas; i++) {
+                output[i] = sigmoid(sigmaOp(weightOp[i], hiddenLayer));
+            }
+        } else {
+            for (int i = 0; i < jumlahKelas; i++) {
+                output[i] = sigmoid(sigmaHL(weightOp[i], ins));
+            }
         }
-        
         return output;
     }
 

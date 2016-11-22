@@ -64,23 +64,34 @@ public class TubesWeka {
             Discretize filter = new Discretize();
             filter.setInputFormat(datatest);
             Instances filterDataSet = Filter.useFilter(datatest, filter);
-                
+//            
+//                Normalize normal = new Normalize();  
+//                normal.setInputFormat(data);
+//                Instances normalize = Filter.useFilter(data, normal);
+//                NominalToBinary ntb = new NominalToBinary();
+//                ntb.setInputFormat(normalize);
+//                Instances filterDataSet = Filter.useFilter(normalize, ntb);
+        
             try { 
                 Classifier classifier = (Classifier) SerializationHelper.read(string + ".model");
-                classifier.buildClassifier(filterDataSet);
+                //classifier.buildClassifier(filterDataSet);
                 eval = new Evaluation(filterDataSet);
-//                int folds = 14;
+                
+                eval.evaluateModel(classifier, filterDataSet);
+                System.out.println(eval.toSummaryString("\nResults\n\n", false));                           
+                System.out.println(eval.toClassDetailsString());                             
+                System.out.println(eval.toMatrixString());
+    //                int folds = 14;
 //                eval.crossValidateModel(classifier, filteredData, folds,
 //                        new Random(1));
-                for (int i = 0;  i < filterDataSet.numInstances(); i++) {
-                    result = classifier.classifyInstance(filterDataSet.instance(i));
-                    filterDataSet.instance(i).setClassValue(result);
-                    System.out.println(filterDataSet.classAttribute().value((int) result));
-                }
+//                for (int i = 0;  i < filterDataSet.numInstances(); i++) {
+//                    result = classifier.classifyInstance(filterDataSet.instance(i));
+//                    filterDataSet.instance(i).setClassValue(result);
+//                    System.out.println(filterDataSet.classAttribute().value((int) result));
+//                }
             } catch(Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("Classification : ");
             
             
         } else if (n == 2) {//memilih dataset yang ingin dipelajari
@@ -107,8 +118,9 @@ public class TubesWeka {
                 classifier.buildClassifier(filteredData);
                 System.out.println("Evaluate model");
                 int folds = 10;
-                eval.crossValidateModel(classifier, filteredData, folds,
-                        new Random(1));
+//                eval.crossValidateModel(classifier, filteredData, folds,
+//                        new Random(1));
+                eval.evaluateModel(classifier, filteredData);
             } else if (n == 2) {//FFNN
                 NominalToBinary ntb = new NominalToBinary();
                 ntb.setInputFormat(normalize);
@@ -128,8 +140,9 @@ public class TubesWeka {
                 classifier.buildClassifier(filteredData);
                 System.out.println("SELESAI BUILD CLASSIFIER");
                 int folds = 10; //10 folds
-                eval.crossValidateModel(classifier, filteredData, folds,
-                        new Random(1));
+//                eval.crossValidateModel(classifier, filteredData, folds,
+//                        new Random(1));
+                eval.evaluateModel(classifier, filteredData);
             }
             
             //mengeluarkan hasil evaluasi
