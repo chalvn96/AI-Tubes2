@@ -15,6 +15,7 @@ import weka.filters.Filter;
 import weka.filters.supervised.attribute.Discretize;
 import weka.filters.supervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
+import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.instance.Randomize;
 
 /**
@@ -48,15 +49,24 @@ public class TubesWeka {
         Instances data = preparedata.getData();
         //System.out.println(data);
         Evaluation eval = null;
-<<<<<<< HEAD
+        System.out.print("Apakah ada kelas yang ingin diremove (Y/N) : ");
+        inputUser = new Scanner(System.in);
+        string = inputUser.nextLine();
+        Instances hasilRemove = data;
+        if ("Y".equals(string) || "y".equals(string)) {
+            System.out.print("Kelas yang mau diremove : ");
+            inputUser = new Scanner(System.in);
+            string = inputUser.nextLine();
+            Remove remove = new Remove();
+            remove.setAttributeIndices(string);
+            remove.setInvertSelection(false);
+            remove.setInputFormat(data);
+            hasilRemove = Filter.useFilter(data, remove);
+        }
+        System.out.println(hasilRemove);
 //        Randomize random = new Randomize();
 //        random.setInputFormat(data);
 //        Instances randomize = Filter.useFilter(data, random);
-=======
-        Randomize random = new Randomize();
-        random.setInputFormat(data);
-        Instances randomize = Filter.useFilter(data, random);
-//<<<<<<< HEAD
 //        
 //        NominalToBinary filter = new NominalToBinary();
 //        //RenameNominalValues filter = new RenameNominalValues();
@@ -66,9 +76,7 @@ public class TubesWeka {
 //        Normalize filter1 = new Normalize();
 //        filter1.setInputFormat(filterNominal);
 //        Instances filteredData = Filter.useFilter(filterNominal, filter1);
-//=======
-//>>>>>>> 6c0f51c847581faf8a6a82bf560cbc492ce3ce7e
->>>>>>> 25731c79b0f3d44973f3fb171767acee6d8c808d
+//
         //System.out.println(filteredData);
         if (n == 1) {//memilih model pembelajaran
             Instances datatest = data;
@@ -120,10 +128,9 @@ public class TubesWeka {
             System.out.print("Masukan input: ");
             n = inputUser.nextInt();
             Classifier classifier = null;
-
             Normalize normal = new Normalize();
-            normal.setInputFormat(data);
-            Instances normalize = Filter.useFilter(data, normal);
+            normal.setInputFormat(hasilRemove);
+            Instances normalize = Filter.useFilter(hasilRemove, normal);
             if (n == 1) {//NAIVE BAYES
                 Discretize filter = new Discretize();
                 filter.setInputFormat(normalize);
