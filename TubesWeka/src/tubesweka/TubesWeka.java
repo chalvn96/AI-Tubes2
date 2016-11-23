@@ -95,13 +95,13 @@ public class TubesWeka {
                 Normalize normal = new Normalize();  
                 normal.setInputFormat(hasilRemove);
                 Instances normalize = Filter.useFilter(hasilRemove, normal);
-                Discretize filter = new Discretize();
-                filter.setInputFormat(normalize);
-                Instances filterDataSet = Filter.useFilter(normalize, filter);
+//                Discretize filter = new Discretize();
+//                filter.setInputFormat(normalize);
+//                Instances filterDataSet = Filter.useFilter(normalize, filter);
 //////                
-//                NominalToBinary ntb = new NominalToBinary();
-//                ntb.setInputFormat(normalize);
-//                Instances filterDataSet = Filter.useFilter(normalize, ntb);
+                NominalToBinary ntb = new NominalToBinary();
+                ntb.setInputFormat(normalize);
+                Instances filterDataSet = Filter.useFilter(normalize, ntb);
 ////        
             try { 
                 Classifier classifier = (Classifier) SerializationHelper.read(string + ".model");
@@ -167,9 +167,9 @@ public class TubesWeka {
 //                System.out.print("Masukan class index dari user : ");
 //                input = inputUser.nextInt();
 //                filteredData.setClassIndex(input - 1);
-                System.out.println("classIndex" + filteredData.classIndex());
-                int jumlahKelas = filteredData.attribute(filteredData.classIndex()).numValues();
-                System.out.println("jumlahKelas" + jumlahKelas);
+//                System.out.println("classIndex" + filteredData.classIndex());
+//                int jumlahKelas = filteredData.attribute(filteredData.classIndex()).numValues();
+//                System.out.println("jumlahKelas" + jumlahKelas);
                 eval = new Evaluation(filteredData);         
                 
                 

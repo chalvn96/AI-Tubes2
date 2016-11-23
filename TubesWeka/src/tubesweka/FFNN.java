@@ -25,6 +25,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
     private double learningRate;
     private double threshold;
     private double momentum;
+    private double iterate;
     
     private int jumlahData;
     private int jumlahAtributAsli;
@@ -112,14 +113,15 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
 //        }
 //      System.out.println("jumlahKelas" + jumlahKelas);
         //initialize bias and learning rate;
-        Random r = new Random();
+        Random r = new Random(77);
         bias = 1.0;
 
 
-        learningRate = 0.1;
-        threshold = 0.00001;
+        learningRate = 0.039;
+        threshold = 0.0009;
         momentum = 0.95;
-        
+        iterate = 7000;
+        double min_error = 1;
         if (jumlahHL == 1) {
             //initialisasi random weight untuk atribut -> hidden layer
             weightHL = new double[jumlahNeuron][jumlahAtributAsli + 1];
@@ -239,8 +241,11 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                 }
                 //2System.out.println("Total error : " + totalError);
                 count++;
+                if(totalError < min_error){
+                    min_error = totalError;
+                }
                 //System.out.println("Total Error : "+totalError);
-            } while (Math.abs(totalError) > threshold && count < 30000) ;
+            } while (Math.abs(totalError) > threshold && count < iterate) ;
             
         } else { //jumlahHL == 0 (single perceptron)
             //initialisasi random weight untuk atribut
@@ -323,8 +328,12 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                 } 
                 count++;
                 //System.out.println("Total Error : "+totalError);
-            } while (Math.abs(totalError) > threshold && count < 5000);
+                if(totalError < min_error){
+                    min_error = totalError;
+                }
+            } while (Math.abs(totalError) > threshold && count < iterate);
         }
+        System.out.println(min_error);
     }
 
     @Override
@@ -365,7 +374,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                 output[i] = sigmoid(sigmaHL(weightOp[i], ins));
             }
         }
-        System.out.println("tes");
+//        System.out.println("tes");
         return output;
     }
 
