@@ -12,8 +12,8 @@ import weka.core.Debug.Random;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.filters.Filter;
-import weka.filters.supervised.attribute.Discretize;
-import weka.filters.supervised.attribute.NominalToBinary;
+import weka.filters.unsupervised.attribute.Discretize;
+import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.instance.Randomize;
@@ -63,7 +63,7 @@ public class TubesWeka {
             remove.setInputFormat(data);
             hasilRemove = Filter.useFilter(data, remove);
         }
-        System.out.println(hasilRemove);
+//        System.out.println(hasilRemove);
 //        Randomize random = new Randomize();
 //        random.setInputFormat(data);
 //        Instances randomize = Filter.useFilter(data, random);
@@ -87,16 +87,20 @@ public class TubesWeka {
             
             //Classification
             double result = 0.0;
-//            Discretize filter = new Discretize();
-//            filter.setInputFormat(datatest);
-//            Instances filterDataSet = Filter.useFilter(datatest, filter);
 //            
                 Normalize normal = new Normalize();  
-                normal.setInputFormat(data);
-                Instances normalize = Filter.useFilter(data, normal);
-                NominalToBinary ntb = new NominalToBinary();
-                ntb.setInputFormat(normalize);
-                Instances filterDataSet = Filter.useFilter(normalize, ntb);
+                normal.setInputFormat(datatest);
+                Instances normalize = Filter.useFilter(datatest, normal);
+                Discretize filter = new Discretize();
+                filter.setInputFormat(normalize);
+                Instances filterDataSet = Filter.useFilter(normalize, filter);
+                int input;
+                System.out.print("Masukan class index dari user : ");
+                input = inputUser.nextInt();
+                filterDataSet.setClassIndex(input - 1);
+//                NominalToBinary ntb = new NominalToBinary();
+//                ntb.setInputFormat(normalize);
+//                Instances filterDataSet = Filter.useFilter(normalize, ntb);
         
             try { 
                 Classifier classifier = (Classifier) SerializationHelper.read(string + ".model");
@@ -128,8 +132,12 @@ public class TubesWeka {
             System.out.print("Masukan input: ");
             n = inputUser.nextInt();
             Classifier classifier = null;
+            
+            //System.out.println(hasildiscretize);
             Normalize normal = new Normalize();
+//            normal.setInputFormat(data);
             normal.setInputFormat(hasilRemove);
+//            Instances normalize = Filter.useFilter(data, normal);
             Instances normalize = Filter.useFilter(hasilRemove, normal);
             if (n == 1) {//NAIVE BAYES
                 Discretize filter = new Discretize();
@@ -142,16 +150,25 @@ public class TubesWeka {
                 System.out.println("Build Classifier");
                 classifier.buildClassifier(filteredData);
                 System.out.println("Evaluate model");
-                int folds = 10;
+                //int folds = 10;
 //                eval.crossValidateModel(classifier, filteredData, folds,
 //                        new Random(1));
                 eval.evaluateModel(classifier, filteredData);
             } else if (n == 2) {//FFNN
-                NominalToBinary ntb = new NominalToBinary();
-                ntb.setInputFormat(normalize);
-                Instances filteredData = Filter.useFilter(normalize, ntb);
-                
-                eval = new Evaluation(filteredData);            
+                Discretize discretize = new Discretize();
+                discretize.setInputFormat(normalize);
+                Instances filteredData = Filter.useFilter(normalize, discretize);
+//                NominalToBinary ntb = new NominalToBinary();
+//                ntb.setInputFormat(normalize);
+//                Instances filteredData = Filter.useFilter(normalize, ntb);
+                int input;
+                System.out.print("Masukan class index dari user : ");
+                input = inputUser.nextInt();
+                filteredData.setClassIndex(input - 1);
+                System.out.println("classIndex" + filteredData.classIndex());
+                int jumlahKelas = filteredData.attribute(filteredData.classIndex()).numValues();
+                System.out.println("jumlahKelas" + jumlahKelas);
+                eval = new Evaluation(filteredData);         
                 
                 
                 System.out.print("Masukkan jumlah hidden layer [0-1]: ");
