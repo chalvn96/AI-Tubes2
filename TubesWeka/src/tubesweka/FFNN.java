@@ -111,7 +111,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         //initialize bias and learning rate;
         Random r = new Random();
         bias = 1.0;
-        learningRate = 0.5;
+        learningRate = 0.2;
         threshold = 0.0001;
         
         if (jumlahHL == 1) {
@@ -225,7 +225,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                 //2System.out.println("Total error : " + totalError);
                 count++;
                 //System.out.println("Total Error : "+totalError);
-            } while (Math.abs(totalError) > threshold && count < 10000) ;
+            } while (Math.abs(totalError) > threshold && count < 20000) ;
             
         } else { //jumlahHL == 0 (single perceptron)
             //initialisasi random weight untuk atribut
