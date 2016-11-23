@@ -117,10 +117,10 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         bias = 1.0;
 
 
-        learningRate = 0.039;
-        threshold = 0.0009;
+        learningRate = 0.08;
+        threshold = 0.0001;
         momentum = 0.95;
-        iterate = 7000;
+        iterate = 2000;
         double min_error = 1;
         if (jumlahHL == 1) {
             //initialisasi random weight untuk atribut -> hidden layer
@@ -128,7 +128,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
             for (int i = 0; i < jumlahNeuron; i++) {
                 for (int j = 0; j < jumlahAtributAsli + 1; j++) { //+1 untuk bias
                     if (j != data.classIndex()) {
-                        weightHL[i][j] = 4*(r.nextDouble() * 2 - 1)/5;               
+                        weightHL[i][j] = (r.nextDouble() * 2 - 1)/5;               
                         
                     }
                 }
@@ -138,7 +138,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
             weightOp = new double[jumlahKelas][jumlahNeuron + 1];
             for (int i = 0; i < jumlahKelas; i++) {
                 for (int j = 0; j < jumlahNeuron + 1; j++) { //+1 untuk bias
-                    weightOp[i][j] = 4*(r.nextDouble() * 2 - 1)/5;
+                    weightOp[i][j] = (r.nextDouble() * 2 - 1)/5;
                 }
             }
             
@@ -382,4 +382,6 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
     public Capabilities getCapabilities() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    
 }

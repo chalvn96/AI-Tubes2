@@ -145,13 +145,24 @@ public class TubesWeka {
                 filter.setInputFormat(normalize);
                 Instances filteredData = Filter.useFilter(normalize, filter);
                 
-                classifier = new NaiveBayes();                
-                eval = new Evaluation(filteredData);            
-                
-                System.out.println("Build Classifier");
+//                classifier = new NaiveBayes();                
+//                eval = new Evaluation(filteredData);            
+//                
+//                System.out.println("Build Classifier");
+//                classifier.buildClassifier(filteredData);
+//                System.out.println("Evaluate model");
+                int folds = 10;
+//                int percent = 66;
+//                int trainSize = (int) Math.round(filteredData.numInstances() * percent / 100);
+//                int testSize = filteredData.numInstances() - trainSize;
+//                Instances train = new Instances(filteredData, 0, trainSize);
+//                Instances test = new Instances(filteredData, trainSize, testSize);
+
+                classifier = new NaiveBayes();
                 classifier.buildClassifier(filteredData);
-                System.out.println("Evaluate model");
-                //int folds = 10;
+                System.out.println("SELESAI BUILD CLASSIFIER");
+                eval = new Evaluation(filteredData);
+                //eval.evaluateModel(classifier, filteredData);
 //                eval.crossValidateModel(classifier, filteredData, folds,
 //                        new Random(1));
                 eval.evaluateModel(classifier, filteredData);
@@ -183,9 +194,18 @@ public class TubesWeka {
                 classifier = new FFNN(jumlahHL, jumlahNeuron);
                 classifier.buildClassifier(filteredData);
                 System.out.println("SELESAI BUILD CLASSIFIER");
+                eval = new Evaluation(filteredData);
                 int folds = 10; //10 folds
 //                eval.crossValidateModel(classifier, filteredData, folds,
 //                        new Random(1));
+//                int percent = 66;
+//                int trainSize = (int) Math.round(filteredData.numInstances() * percent / 100);
+//                int testSize = filteredData.numInstances() - trainSize;
+//                Instances train = new Instances(filteredData, 0, trainSize);
+//                Instances test = new Instances(filteredData, trainSize, testSize);
+
+                
+               
                 eval.evaluateModel(classifier, filteredData);
             }
             
@@ -211,5 +231,23 @@ public class TubesWeka {
         
         }
     }
-          
+    
+    public Classifier SplitTest(Instances data, int percent) throws Exception {
+        int trainSize = (int) Math.round(data.numInstances() * percent / 100);
+        int testSize = data.numInstances() - trainSize;
+        Instances train = new Instances(data, 0, trainSize);
+        Instances test = new Instances(data, trainSize, testSize);
+
+        Classifier nb = new NaiveBayes();
+        nb.buildClassifier(train);
+        Evaluation eval = new Evaluation(test);
+        eval.evaluateModel(nb, test);
+
+        System.out.println();
+        System.out.println("=== Summary ===");
+        System.out.println(eval.toSummaryString());
+        System.out.println(eval.toMatrixString());
+
+        return nb;
+ }
 }
