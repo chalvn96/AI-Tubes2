@@ -48,9 +48,27 @@ public class TubesWeka {
         Instances data = preparedata.getData();
         //System.out.println(data);
         Evaluation eval = null;
+<<<<<<< HEAD
 //        Randomize random = new Randomize();
 //        random.setInputFormat(data);
 //        Instances randomize = Filter.useFilter(data, random);
+=======
+        Randomize random = new Randomize();
+        random.setInputFormat(data);
+        Instances randomize = Filter.useFilter(data, random);
+//<<<<<<< HEAD
+//        
+//        NominalToBinary filter = new NominalToBinary();
+//        //RenameNominalValues filter = new RenameNominalValues();
+//        filter.setInputFormat(randomize);
+//        Instances filterNominal = Filter.useFilter(randomize, filter);
+//        //System.out.println(filterNominal);
+//        Normalize filter1 = new Normalize();
+//        filter1.setInputFormat(filterNominal);
+//        Instances filteredData = Filter.useFilter(filterNominal, filter1);
+//=======
+//>>>>>>> 6c0f51c847581faf8a6a82bf560cbc492ce3ce7e
+>>>>>>> 25731c79b0f3d44973f3fb171767acee6d8c808d
         //System.out.println(filteredData);
         if (n == 1) {//memilih model pembelajaran
             Instances datatest = data;
