@@ -27,10 +27,7 @@ public class PrepareData {
             inputData = userInput.nextLine();
             ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource("testcase\\" + inputData + ".arff");
             data = dataSource.getDataSet();
-//            int input;
-//            System.out.print("Masukan class index dari user : ");
-//            input = userInput.nextInt();
-//            data.setClassIndex(input - 1);
+            
         } catch (Exception ex) {
                 Logger.getLogger(PrepareData.class.getName()).log(Level.SEVERE, null, ex);
         }

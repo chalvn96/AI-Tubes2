@@ -107,9 +107,9 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
         //tentukan jumlah neuron output
         jumlahKelas = data.attribute(data.classIndex()).numValues();
         
-        if (jumlahKelas == 0) {
-            jumlahKelas = 1;
-        }
+//        if (jumlahKelas == 0) {
+//            jumlahKelas = 1;
+//        }
 //      System.out.println("jumlahKelas" + jumlahKelas);
         //initialize bias and learning rate;
         Random r = new Random();
@@ -117,7 +117,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
 
 
         learningRate = 0.1;
-        threshold = 0.001;
+        threshold = 0.00001;
         momentum = 0.95;
         
         if (jumlahHL == 1) {
@@ -163,10 +163,10 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     
                     //hitung error masing-masing output
                     double[] errorOp = new double[jumlahKelas];
-                    if (jumlahKelas == 1) {
-                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
-                        
-                    } else {
+//                    if (jumlahKelas == 1) {
+//                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
+//                        
+//                    } else {
                         for (int i = 0; i < jumlahKelas; i++) {
 
                             if( i == Math.round(ins.value(ins.classIndex()))  )
@@ -175,7 +175,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                                 errorOp[i] = errorOp(output[i], 0.00 );
 
                         }
-                    }
+//                    }
                     
                     //hitung error masing-masing hidden layer
                     double[] errorHL = new double[jumlahNeuron];
@@ -218,10 +218,10 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     
                     //hitung error masing-masing output
                     double[] errorOp = new double[jumlahKelas];
-                    if (jumlahKelas == 1) {
-                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
-                        
-                    } else {
+//                    if (jumlahKelas == 1) {
+//                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
+//                        
+//                    } else {
                         for (int i = 0; i < jumlahKelas; i++) {
 
                            if( i == Math.round(ins.value(ins.classIndex()))  ){
@@ -233,7 +233,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
 
                            }
                         }
-                    }
+//                    }
                     //2System.out.println("        sigmaError= "+sigmaError(errorOp));
                     totalError += sigmaError(errorOp);
                 }
@@ -271,10 +271,10 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     
                     //hitung error masing-masing output
                     double[] errorOp = new double[jumlahKelas];
-                    if (jumlahKelas == 1) {
-                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
-                        
-                    } else {
+//                    if (jumlahKelas == 1) {
+//                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
+//                        
+//                    } else {
                         for (int i = 0; i < jumlahKelas; i++) {
 
                             if( i == Math.round(ins.value(ins.classIndex()))  ){
@@ -284,7 +284,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                                 errorOp[i] = errorOp(output[i], 0.00 );
                             }
                         }
-                    }
+//                    }
                     
                     //update setiap weight output
                     for (int i = 0; i < jumlahKelas; i++) {
@@ -308,17 +308,17 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                     
                     //hitung error masing-masing output
                     double[] errorOp = new double[jumlahKelas];
-                    if (jumlahKelas == 1) {
-                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
-                        
-                    } else {
+//                    if (jumlahKelas == 1) {
+//                        errorOp[0] = errorOp(output[0], ins.value(ins.classIndex()));
+//                        
+//                    } else {
                         for (int i = 0; i < jumlahKelas; i++) {
                             if( i == Math.round(ins.value(ins.classIndex()))  )
                                 errorOp[i] = errorOp(output[i], 1.00);
                             else
                                 errorOp[i] = errorOp(output[i], 0.00 );
                         }
-                    }
+//                    }
                     totalError += sigmaErrorSP(errorOp);
                 } 
                 count++;
@@ -365,6 +365,7 @@ public class FFNN extends AbstractClassifier implements Classifier, Serializable
                 output[i] = sigmoid(sigmaHL(weightOp[i], ins));
             }
         }
+        System.out.println("tes");
         return output;
     }
 
